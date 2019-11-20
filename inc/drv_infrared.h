@@ -14,5 +14,6 @@
 #include <rtthread.h>
 
 int drv_infrared_init(void);
+void drv_infrared_deinit(void);
 
 #endif

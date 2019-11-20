@@ -262,7 +262,48 @@ int drv_infrared_init()
 
     return 0;
 }
-INIT_APP_EXPORT(drv_infrared_init);
+// INIT_APP_EXPORT(drv_infrared_init);
+
+#ifdef INFRARED_SEND
+rt_err_t infrared_send_deinit(void)
+{
+    if (pwm_dev != RT_NULL)
+    {
+        rt_pwm_disable(pwm_dev, PWM_DEV_CHANNEL);
+    }
+    if (send_time_dev != RT_NULL)
+    {
+        rt_device_close(send_time_dev);
+    }
+    return 0;
+}
+#endif /* INFRARED_SEND */
+
+#ifdef INFRARED_RECEIVE
+rt_err_t infrared_receive_deinit(void)
+{
+    rt_pin_irq_enable(RECEIVE_PIN,PIN_IRQ_DISABLE);
+    rt_pin_detach_irq(RECEIVE_PIN);
+    rt_pin_mode(RECEIVE_PIN, PIN_MODE_INPUT);
+    if (receive_time_dev != RT_NULL)
+    {
+        rt_device_close(receive_time_dev);
+    }
+    return 0;
+}
+#endif /* INFRARED_RECEIVE */
+
+void drv_infrared_deinit()
+{
+    #ifdef INFRARED_SEND
+    infrared_send_deinit();
+    infrared->send = infrared_send;
+#endif /* INFRARED_SEND */
+
+#ifdef INFRARED_RECEIVE
+    infrared_receive_deinit();
+#endif /* INFRARED_RECEIVE */
+}
 
 #endif /* PKG_USING_DRV_INFRARED */
 #endif /* PKG_USING_INFRARED */
